@@ -36,10 +36,10 @@ pyrofork
 python-arq==6.0.7
 python-dotenv==1.0.1
 ffmpeg-python==0.2.0
-redis==5.0.2
+redis==4.0.2
 telegraph==2.2.0
-motor
-pymongo[srv]==4.7.2
+motor<3.2.0,>=2.1.0
+pymongo<=5.0.0,>=4.9
 odmantic==0.9.2
 opencv-python-headless==4.10.0.82
 pykeyboard
@@ -53,5 +53,12 @@ search_engine_parser==0.6.8
 googletrans==2.4.0
 gpytranslate==1.5.1
 cloudscraper==1.2.70
-carbonnow
 pretty_errors
+aiohttp>=3.6.2,<4.0
+pip>=24.2
+async-timeout==3.0.1
+carbonnow==0.0.1  # keep this version since it requires aiohttp==3.7.3
+search-engine-parser==0.6.8  # will work with aiohttp 3.x
+jikanpy==4.3.2  # no strict version requirements for aiohttp
+python-arq==6.0.7  # no strict version requirements for aiohttp
+aiohttp>=3.7.3,<4.0  # to match requirements from multiple packages
