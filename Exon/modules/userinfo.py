@@ -275,7 +275,7 @@ def info(update: Update, context: CallbackContext):
     rep = message.reply_text("<code>ᴀᴘᴘʀᴀɪꜱɪɴɢ...</code>", parse_mode=ParseMode.HTML)
 
     text = (
-        f"╔━⊰✦✪「 <b> Appraisal Results:</b> 」✪✦⊱━╗\n"
+        f"━✦「 <b> Appraisal Results:</b> 」✦━\n"
         f"➻ ɪᴅ: <code>{user.id}</code>\n"
         f"➻ ꜰɪʀꜱᴛ ɴᴀᴍᴇ: {html.escape(user.first_name)}"
     )
@@ -291,10 +291,10 @@ def info(update: Update, context: CallbackContext):
     if chat.type != "private" and user_id != bot.id:
         _stext = "\n➻ <b>ᴩʀᴇsᴇɴᴄᴇ:</b> <code>{}</code>"
 
-        # afk_st = is_afk(user.id)
-        #  if afk_st:
-        #     text += _stext.format("AFK")
-        # else:
+        afk_st = is_afk(user.id)
+         if afk_st:
+          text += _stext.format("AFK")
+        
         status = status = bot.get_chat_member(chat.id, user.id).status
         if status:
             if status in {"left", "kicked"}:
@@ -339,10 +339,7 @@ def info(update: Update, context: CallbackContext):
         text += "\n\nᴄᴏ-ᴏᴡᴇʀɴ ᴏғ ᴀ ʙᴏᴛ."
         disaster_level_present = True
 
-    if disaster_level_present:
-        text += ' [<a href="https://t.me/Abishnoi_bots/60">ʟᴇᴠᴇʟʟɪɴɢ</a>]'.format(
-            bot.username,
-        )
+
 
     try:
         user_member = chat.get_member(user.id)
@@ -372,39 +369,18 @@ def info(update: Update, context: CallbackContext):
             context.bot.send_photo(
                 chat.id,
                 photo=profile,
-                caption=(text),
-                reply_markup=InlineKeyboardMarkup(
-                    [
-                        [
-                            InlineKeyboardButton(
-                                "ʜᴇᴀʟᴛʜ", url="https://t.me/Abishnoi_bots/60"
-                            ),
-                            InlineKeyboardButton(
-                                "ᴅɪsᴀsᴛᴇʀ", url="https://t.me/Abishnoi_bots/60"
-                            ),
-                        ],
-                    ]
-                ),
+                caption=(text),              
                 parse_mode=ParseMode.HTML,
                 disable_web_page_preview=True,
             )
+
+
+        
 
         # Incase user don't have profile pic, send normal text
         except IndexError:
             message.reply_text(
                 text,
-                reply_markup=InlineKeyboardMarkup(
-                    [
-                        [
-                            InlineKeyboardButton(
-                                "ʜᴇᴀʟᴛʜ", url="https://t.me/Abishnoi_bots/60"
-                            ),
-                            InlineKeyboardButton(
-                                "ʟᴇᴠᴇʟʟɪɴɢ", url="https://t.me/Abishnoi_bots/60"
-                            ),
-                        ],
-                    ]
-                ),
                 parse_mode=ParseMode.HTML,
                 disable_web_page_preview=True,
             )
@@ -473,63 +449,7 @@ def set_about_me(update: Update, context: CallbackContext):
             )
 
 
-@Exoncmd(command="stats", can_disable=True)
-@sudo_plus
-def stats(update, context):
-    db_size = SESSION.execute(
-        "SELECT pg_size_pretty(pg_database_size(current_database()))"
-    ).scalar_one_or_none()
-    uptime = datetime.datetime.fromtimestamp(boot_time()).strftime("%Y-%m-%d %H:%M:%S")
-    botuptime = get_readable_time((time.time() - StartTime))
-    status = "*╒═══「 ꜱʏꜱᴛᴇᴍ ꜱᴛᴀᴛɪᴄꜱ: 」*\n\n"
-    status += f"*× ꜱʏꜱᴛᴇᴍ ꜱᴛᴀʀᴛ ᴛɪᴍᴇ:* {str(uptime)}" + "\n"
-    uname = platform.uname()
-    status += f"*× ꜱʏꜱᴛᴇᴍ:* {str(uname.system)}" + "\n"
-    status += f"*× ɴᴏᴅᴇ ɴᴀᴍᴇ:* {escape_markdown(str(uname.node))}" + "\n"
-    status += f"*× ʀᴇʟᴇᴀꜱᴇ:* {escape_markdown(str(uname.release))}" + "\n"
-    status += f"*× ᴍᴀᴄʜɪɴᴇ:* {escape_markdown(str(uname.machine))}" + "\n"
 
-    mem = virtual_memory()
-    cpu = cpu_percent()
-    disk = disk_usage("/")
-    status += f"*× ᴄᴘᴜ:* {str(cpu)}" + " %\n"
-    status += f"*× ʀᴀᴍ:* {str(mem[2])}" + " %\n"
-    status += f"*× ꜱᴛᴏʀᴀɢᴇ:* {str(disk[3])}" + " %\n\n"
-    status += f"*× ᴘʏᴛʜᴏɴ ᴠᴇʀꜱɪᴏɴ:* {python_version()}" + "\n"
-    status += f"*× ᴘʏᴛʜᴏɴ-ᴛᴇʟᴇɢʀᴀᴍ-ʙᴏᴛ:* {str(ptbver)}" + "\n"
-    status += f"*× ᴜᴘᴛɪᴍᴇ:* {str(botuptime)}" + "\n"
-    status += f"*× ᴅʙ ꜱɪᴢᴇ:* {str(db_size)}" + "\n"
-    kb = [[InlineKeyboardButton("Ping", callback_data="pingCB")]]
-    # repo = git.Repo(search_parent_directories=True)
-    # sha = repo.head.object.hexsha
-    # status += f"*× ᴄᴏᴍᴍɪᴛ*: {sha[0:9]}\n"
-    try:
-        update.effective_message.reply_text(
-            status
-            + "\n*Bot statistics*:\n"
-            + "\n".join([mod.__stats__() for mod in STATS])
-            + "\n\n[⍙ ɢɪᴛʜᴜʙ](https://github.com/Abishnoi69/ExonRobot) | ⍚\n\n "
-            + "╘══「 by [ᴀʙɪsʜɴᴏɪ](github.com/Abishnoi69) 」\n",
-            parse_mode=ParseMode.MARKDOWN,
-            reply_markup=InlineKeyboardMarkup(kb),
-            disable_web_page_preview=True,
-        )
-    except BaseException:
-        update.effective_message.reply_text(
-            (
-                    (
-                            (
-                                    "\n*Bot statistics*:\n"
-                                    + "\n".join(mod.__stats__() for mod in STATS)
-                            )
-                            + "\n\n⍙ [ɢɪᴛʜᴜʙ](https://github.com/Abishnoi69/ExonRobot) | ⍚ \n\n"
-                    )
-                    + "╘══「 by [ᴅʏɴᴀᴍɪᴄ](github.com/Abishnoi69) 」\n"
-            ),
-            parse_mode=ParseMode.MARKDOWN,
-            reply_markup=InlineKeyboardMarkup(kb),
-            disable_web_page_preview=True,
-        )
 
 
 @Exoncallback(pattern=r"^pingCB")
