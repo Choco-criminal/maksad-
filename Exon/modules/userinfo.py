@@ -611,6 +611,8 @@ def stats(update, context):
             reply_markup=InlineKeyboardMarkup(kb),
             disable_web_page_preview=True,
         )
+
+) 
             
         
 @Exoncmd(command="setbio")
