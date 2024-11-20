@@ -366,7 +366,7 @@ def info(update: Update, context: CallbackContext):
             context.bot.sendChatAction(chat.id, "upload_photo")
             context.bot.send_photo(
                 chat.id,
-                photo=await app.download_media(dp_user),
+                photo= app.download_media(dp_user),
                 caption=(text),
                 parse_mode=ParseMode.HTML,
                 disable_web_page_preview=True,
