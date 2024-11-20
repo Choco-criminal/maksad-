@@ -452,43 +452,57 @@ def set_about_me(update: Update, context: CallbackContext):
 @Exoncmd(command="stats", can_disable=True)
 @sudo_plus
 def stats(update, context):
+    # Get database size
     db_size = SESSION.execute(
         "SELECT pg_size_pretty(pg_database_size(current_database()))"
     ).scalar_one_or_none()
+
+    # Get system and bot uptime
     uptime = datetime.datetime.fromtimestamp(boot_time()).strftime("%Y-%m-%d %H:%M:%S")
     botuptime = get_readable_time((time.time() - StartTime))
-    status = "*╒═══「 ꜱʏꜱᴛᴇᴍ ꜱᴛᴀᴛɪᴄꜱ: 」*\n\n"
-    status += f"*× ꜱʏꜱᴛᴇᴍ ꜱᴛᴀʀᴛ ᴛɪᴍᴇ:* {str(uptime)}" + "\n"
-    uname = platform.uname()
-    status += f"*× ꜱʏꜱᴛᴇᴍ:* {str(uname.system)}" + "\n"
-    status += f"*× ɴᴏᴅᴇ ɴᴀᴍᴇ:* {escape_markdown(str(uname.node))}" + "\n"
-    status += f"*× ʀᴇʟᴇᴀꜱᴇ:* {escape_markdown(str(uname.release))}" + "\n"
-    status += f"*× ᴍᴀᴄʜɪɴᴇ:* {escape_markdown(str(uname.machine))}" + "\n"
 
+    # Start building status message
+    status = "*╒═══「 ꜱʏꜱᴛᴇᴍ ꜱᴛᴀᴛɪᴄꜱ: 」*\n\n"
+    status += f"*× ꜱʏꜱᴛᴇᴍ ꜱᴛᴀʀᴛ ᴛɪᴍᴇ:* {uptime}\n"
+
+    uname = platform.uname()
+    status += f"*× ꜱʏꜱᴛᴇᴍ:* {uname.system}\n"
+    status += f"*× ɴᴏᴅᴇ ɴᴀᴍᴇ:* {escape_markdown(uname.node)}\n"
+    status += f"*× ʀᴇʟᴇᴀꜱᴇ:* {escape_markdown(uname.release)}\n"
+    status += f"*× ᴍᴀᴄʜɪɴᴇ:* {escape_markdown(uname.machine)}\n"
+
+    # System resources
     mem = virtual_memory()
     cpu = cpu_percent()
     disk = disk_usage("/")
-    status += f"*× ᴄᴘᴜ:* {str(cpu)}" + " %\n"
-    status += f"*× ʀᴀᴍ:* {str(mem[2])}" + " %\n"
-    status += f"*× ꜱᴛᴏʀᴀɢᴇ:* {str(disk[3])}" + " %\n\n"
-    status += f"*× ᴘʏᴛʜᴏɴ ᴠᴇʀꜱɪᴏɴ:* {python_version()}" + "\n"
-    status += f"*× ᴘʏᴛʜᴏɴ-ᴛᴇʟᴇɢʀᴀᴍ-ʙᴏᴛ:* {str(ptbver)}" + "\n"
-    status += f"*× ᴜᴘᴛɪᴍᴇ:* {str(botuptime)}" + "\n"
-    status += f"*× ᴅʙ ꜱɪᴢᴇ:* {str(db_size)}" + "\n"
+    status += f"*× ᴄᴘᴜ:* {cpu} %\n"
+    status += f"*× ʀᴀᴍ:* {mem.percent} %\n"
+    status += f"*× ꜱᴛᴏʀᴀɢᴇ:* {disk.percent} %\n\n"
+
+    # Python and library versions
+    status += f"*× ᴘʏᴛʜᴏɴ ᴠᴇʀꜱɪᴏɴ:* {python_version()}\n"
+    status += f"*× ᴘʏᴛʜᴏɴ-ᴛᴇʟᴇɢʀᴀᴍ-ʙᴏᴛ:* {ptbver}\n"
+    status += f"*× ᴜᴘᴛɪᴍᴇ:* {botuptime}\n"
+    status += f"*× ᴅʙ ꜱɪᴢᴇ:* {db_size}\n"
+
+    # Inline keyboard
     kb = [[InlineKeyboardButton("Ping", callback_data="pingCB")]]
-    # repo = git.Repo(search_parent_directories=True)
-    # sha = repo.head.object.hexsha
-    # status += f"*× ᴄᴏᴍᴍɪᴛ*: {sha[0:9]}\n"
+    reply_markup = InlineKeyboardMarkup(kb)
+
+    # Bot statistics
+    stats_text = "\n".join([mod.__stats__() for mod in STATS])
+
     try:
         update.effective_message.reply_text(
             status
             + "\n*Bot statistics*:\n"
-            + "\n".join([mod.__stats__() for mod in STATS])
+            + stats_text,
             parse_mode=ParseMode.MARKDOWN,
-            reply_markup=InlineKeyboardMarkup(kb),
+            reply_markup=reply_markup,
             disable_web_page_preview=True,
         )
-    
+    except Exception as e:
+        logger.error(f"Error sending stats message: {e}")
 
 
 @Exoncallback(pattern=r"^pingCB")
