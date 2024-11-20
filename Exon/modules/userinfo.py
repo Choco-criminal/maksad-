@@ -486,28 +486,11 @@ def stats(update, context):
             status
             + "\n*Bot statistics*:\n"
             + "\n".join([mod.__stats__() for mod in STATS])
-            + "\n\n[⍙ ɢɪᴛʜᴜʙ](https://github.com/Abishnoi69/ExonRobot) | ⍚\n\n "
-            + "╘══「 by [ᴀʙɪsʜɴᴏɪ](github.com/Abishnoi69) 」\n",
             parse_mode=ParseMode.MARKDOWN,
             reply_markup=InlineKeyboardMarkup(kb),
             disable_web_page_preview=True,
         )
-    except BaseException:
-        update.effective_message.reply_text(
-            (
-                    (
-                            (
-                                    "\n*Bot statistics*:\n"
-                                    + "\n".join(mod.__stats__() for mod in STATS)
-                            )
-                            + "\n\n⍙ [ɢɪᴛʜᴜʙ](https://github.com/Abishnoi69/ExonRobot) | ⍚ \n\n"
-                    )
-                    + "╘══「 by [ᴅʏɴᴀᴍɪᴄ](github.com/Abishnoi69) 」\n"
-            ),
-            parse_mode=ParseMode.MARKDOWN,
-            reply_markup=InlineKeyboardMarkup(kb),
-            disable_web_page_preview=True,
-        )
+    
 
 
 @Exoncallback(pattern=r"^pingCB")
@@ -576,7 +559,47 @@ def about_bio(update: Update, context: CallbackContext):
     else:
         message.reply_text("ʀᴇᴘʟʏ ᴛᴏ ꜱᴏᴍᴇᴏɴᴇ'ꜱ ᴍᴇꜱꜱᴀɢᴇ ᴛᴏ ꜱᴇᴛ ᴛʜᴇɪʀ ʙɪᴏ!")
 
+@Exoncmd(command="stats", can_disable=True)
+@sudo_plus
+def stats(update, context):
+    db_size = SESSION.execute(
+        "SELECT pg_size_pretty(pg_database_size(current_database()))"
+    ).scalar_one_or_none()
+    uptime = datetime.datetime.fromtimestamp(boot_time()).strftime("%Y-%m-%d %H:%M:%S")
+    botuptime = get_readable_time((time.time() - StartTime))
+    status = "*╒═══「 ꜱʏꜱᴛᴇᴍ ꜱᴛᴀᴛɪᴄꜱ: 」*\n\n"
+    status += f"*× ꜱʏꜱᴛᴇᴍ ꜱᴛᴀʀᴛ ᴛɪᴍᴇ:* {str(uptime)}" + "\n"
+    uname = platform.uname()
+    status += f"*× ꜱʏꜱᴛᴇᴍ:* {str(uname.system)}" + "\n"
+    status += f"*× ɴᴏᴅᴇ ɴᴀᴍᴇ:* {escape_markdown(str(uname.node))}" + "\n"
+    status += f"*× ʀᴇʟᴇᴀꜱᴇ:* {escape_markdown(str(uname.release))}" + "\n"
+    status += f"*× ᴍᴀᴄʜɪɴᴇ:* {escape_markdown(str(uname.machine))}" + "\n"
 
+    mem = virtual_memory()
+    cpu = cpu_percent()
+    disk = disk_usage("/")
+    status += f"*× ᴄᴘᴜ:* {str(cpu)}" + " %\n"
+    status += f"*× ʀᴀᴍ:* {str(mem[2])}" + " %\n"
+    status += f"*× ꜱᴛᴏʀᴀɢᴇ:* {str(disk[3])}" + " %\n\n"
+    status += f"*× ᴘʏᴛʜᴏɴ ᴠᴇʀꜱɪᴏɴ:* {python_version()}" + "\n"
+    status += f"*× ᴘʏᴛʜᴏɴ-ᴛᴇʟᴇɢʀᴀᴍ-ʙᴏᴛ:* {str(ptbver)}" + "\n"
+    status += f"*× ᴜᴘᴛɪᴍᴇ:* {str(botuptime)}" + "\n"
+    status += f"*× ᴅʙ ꜱɪᴢᴇ:* {str(db_size)}" + "\n"
+    kb = [[InlineKeyboardButton("Ping", callback_data="pingCB")]]
+    # repo = git.Repo(search_parent_directories=True)
+    # sha = repo.head.object.hexsha
+    # status += f"*× ᴄᴏᴍᴍɪᴛ*: {sha[0:9]}\n"
+    try:
+        update.effective_message.reply_text(
+            status
+            + "\n*Bot statistics*:\n"
+            + "\n".join([mod.__stats__() for mod in STATS])
+            parse_mode=ParseMode.MARKDOWN,
+            reply_markup=InlineKeyboardMarkup(kb),
+            disable_web_page_preview=True,
+        )
+            
+        
 @Exoncmd(command="setbio")
 def set_about_bio(update: Update, context: CallbackContext):
     message = update.effective_message
