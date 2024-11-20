@@ -504,7 +504,7 @@ def stats(update, context):
             ),
             parse_mode=ParseMode.MARKDOWN,
             reply_markup=InlineKeyboardMarkup(kb),
-
+    ) 
             
 @Exoncallback(pattern=r"^pingCB")
 def pingCallback(update: Update, context: CallbackContext):
