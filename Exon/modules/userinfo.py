@@ -483,15 +483,29 @@ def stats(update, context):
         update.effective_message.reply_text(
             status
             + "\n*Bot statistics*:\n"
-            + "\n".join([mod.__stats__() for mod in STATS]),
+            + "\n".join([mod.__stats__() for mod in STATS])
+            + "\n\nsʏsᴛᴜᴍᴍᴍᴍ| ⍚\n\n "
+            + "「 ғᴜʙᴜᴋɪ 」\n",
             parse_mode=ParseMode.MARKDOWN,
             reply_markup=InlineKeyboardMarkup(kb),
             disable_web_page_preview=True,
         )
-    except Exception as e:
-        update.effective_message.reply_text(f"Error: {str(e)}")
+    except BaseException:
+        update.effective_message.reply_text(
+            (
+                    (
+                            (
+                                    "\n*Bot statistics*:\n"
+                                    + "\n".join(mod.__stats__() for mod in STATS)
+                            )
+                            + "\n\nsʏsᴛᴜᴍᴍᴍ| ⍚ \n\n"
+                    )
+                    + "「 ғᴜʙᴜᴋɪ 」\n"
+            ),
+            parse_mode=ParseMode.MARKDOWN,
+            reply_markup=InlineKeyboardMarkup(kb),
 
-
+            
 @Exoncallback(pattern=r"^pingCB")
 def pingCallback(update: Update, context: CallbackContext):
     query = update.callback_query
