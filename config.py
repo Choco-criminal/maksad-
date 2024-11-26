@@ -28,7 +28,7 @@ class Config(object):
     )
     DB_NAME = getenv("DB_NAME", "ExonRobot")
     REDIS_URL = "redis://default:wK6ZCiclq4iQKYpgfY90v6kd6WdPfEwl@redis-10186.c263.us-east-1-2.ec2.cloud.redislabs.com:10186/default"
-    DATABASE_URL = getenv("DATABASE_URL", "postgres://avnadmin:AVNS_TbzxTp8QTaLOy_GjvCr@choco-chocoxgithub-f883.j.aivencloud.com:16510/defaultdb?sslmode=require")
+    DATABASE_URL = getenv("DATABASE_URL", "postgres://avnadmin:AVNS_56xhfKFkBo-iiPYoj_F@choco-chocoxgithub-f883.b.aivencloud.com:16510/defaultdb?sslmode=require")
 
     # ɴᴏ ᴇᴅɪᴛ ᴢᴏɴᴇ
     if DATABASE_URL.startswith("postgres://"):
